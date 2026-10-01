@@ -11,343 +11,753 @@ from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.metrics import r2_score,mean_absolute_error
 from sklearn.preprocessing import RobustScaler
 
-
 st.set_page_config(
-    page_title="RetailIQ – Demand Forecasting & Inventory Optimization 📈",
-    page_icon="📈",
-    layout="wide"
+    page_title="RetailIQ | Demand Intelligence",
+    page_icon="📊",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
-
 
 st.markdown("""
 <style>
-#MainMenu{visibility:hidden;}
-footer{visibility:hidden;}
-header{visibility:hidden;}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root{
+    --navy:#0b1f3a;
+    --navy2:#102a4c;
+    --blue:#2563eb;
+    --blue-soft:#eff6ff;
+    --orange:#f97316;
+    --orange-soft:#fff7ed;
+    --green:#15803d;
+    --green-soft:#ecfdf3;
+    --red:#dc2626;
+    --red-soft:#fef2f2;
+    --amber:#d97706;
+    --amber-soft:#fffbeb;
+    --text:#0f172a;
+    --muted:#64748b;
+    --light:#94a3b8;
+    --border:#e2e8f0;
+    --surface:#ffffff;
+    --background:#f8fafc;
+}
+
+*{
+    font-family:'Inter',sans-serif;
+}
+
+html,body,[class*="css"]{
+    font-family:'Inter',sans-serif;
+}
+
+#MainMenu{
+    visibility:hidden;
+}
+
+footer{
+    visibility:hidden;
+}
+
+header{
+    visibility:hidden;
+}
 
 [data-testid="stAppViewContainer"]{
-    background:#f6f8fb;
+    background:var(--background);
 }
 
-[data-testid="stSidebar"]{
-    background:#0f172a;
-    border-right:1px solid #1e293b;
-}
-
-[data-testid="stSidebar"] *{
-    color:#e5e7eb;
-}
-
-[data-testid="stSidebar"] .stRadio label{
-    color:#cbd5e1;
-    font-size:14px;
-}
-
-[data-testid="stSidebar"] .stRadio div[role="radiogroup"]{
-    gap:6px;
-}
-
-[data-testid="stSidebar"] hr{
-    border-color:#334155;
-}
-
-[data-testid="stSidebar"] .stSelectbox>div>div{
-    background:#1e293b !important;
-    border:1px solid #475569 !important;
-    border-radius:9px !important;
-}
-
-[data-testid="stSidebar"] .stSelectbox>div>div:hover{
-    border-color:#64748b !important;
-}
-
-[data-testid="stSidebar"] .stSelectbox input{
-    color:#ffffff !important;
-}
-
-[data-testid="stSidebar"] .stSelectbox svg{
-    color:#cbd5e1 !important;
-}
-
-[data-testid="stSidebar"] .stSelectbox [data-baseweb="select"]{
-    background:#1e293b !important;
-}
-
-[data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] div{
-    color:#ffffff !important;
-}
-
-[data-testid="stSidebar"] .stButton button{
-    background:#1e293b !important;
-    color:#f8fafc !important;
-    border:1px solid #475569 !important;
-    border-radius:9px !important;
-    font-weight:600 !important;
-    transition:all .2s ease;
-}
-
-[data-testid="stSidebar"] .stButton button:hover{
-    background:#334155 !important;
-    border-color:#64748b !important;
-    color:#ffffff !important;
+[data-testid="stHeader"]{
+    background:transparent;
 }
 
 .block-container{
-    padding-top:28px;
-    padding-bottom:40px;
-    max-width:1500px;
+    max-width:1480px;
+    padding-top:30px;
+    padding-bottom:55px;
+    padding-left:42px;
+    padding-right:42px;
+}
+
+[data-testid="stSidebar"]{
+    background:#ffffff;
+    border-right:1px solid var(--border);
+}
+
+[data-testid="stSidebar"] > div:first-child{
+    padding-top:24px;
+}
+
+[data-testid="stSidebar"] *{
+    color:var(--text);
+}
+
+[data-testid="stSidebar"] .stRadio label{
+    color:#475569;
+    font-size:13px;
+    font-weight:600;
+}
+
+[data-testid="stSidebar"] .stRadio div[role="radiogroup"]{
+    gap:5px;
+}
+
+[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label{
+    padding:10px 12px;
+    border-radius:10px;
+    transition:all .18s ease;
+}
+
+[data-testid="stSidebar"] .stRadio div[role="radiogroup"] label:hover{
+    background:#f1f5f9;
+}
+
+[data-testid="stSidebar"] hr{
+    border-color:#e2e8f0;
+    margin-top:18px;
+    margin-bottom:18px;
+}
+
+[data-testid="stSidebar"] .stSelectbox>div>div{
+    background:#ffffff!important;
+    border:1px solid #cbd5e1!important;
+    border-radius:9px!important;
+}
+
+[data-testid="stSidebar"] .stSelectbox>div>div:hover{
+    border-color:#94a3b8!important;
+}
+
+[data-testid="stSidebar"] .stSelectbox input{
+    color:var(--text)!important;
+}
+
+[data-testid="stSidebar"] .stSelectbox svg{
+    color:#64748b!important;
+}
+
+[data-testid="stSidebar"] .stSelectbox [data-baseweb="select"]{
+    background:#ffffff!important;
+}
+
+[data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] div{
+    color:var(--text)!important;
+}
+
+[data-testid="stSidebar"] .stButton button{
+    background:#ffffff!important;
+    color:#334155!important;
+    border:1px solid #cbd5e1!important;
+    border-radius:9px!important;
+    font-weight:600!important;
+}
+
+[data-testid="stSidebar"] .stButton button:hover{
+    background:#f8fafc!important;
+    border-color:#94a3b8!important;
+}
+
+.sidebar-brand{
+    padding:4px 2px 25px 2px;
+}
+
+.sidebar-logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.sidebar-mark{
+    width:36px;
+    height:36px;
+    border-radius:10px;
+    background:var(--navy);
+    color:#ffffff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:17px;
+    font-weight:800;
+}
+
+.sidebar-name{
+    font-size:20px;
+    line-height:1;
+    font-weight:800;
+    color:var(--navy);
+    letter-spacing:-.5px;
+}
+
+.sidebar-tagline{
+    margin-top:9px;
+    margin-left:46px;
+    color:#94a3b8;
+    font-size:10px;
+    font-weight:600;
+    letter-spacing:.6px;
+    text-transform:uppercase;
+}
+
+.sidebar-section{
+    color:#94a3b8;
+    font-size:10px;
+    font-weight:700;
+    letter-spacing:.9px;
+    text-transform:uppercase;
+    margin-bottom:8px;
 }
 
 .topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
     background:#ffffff;
-    border:1px solid #e5e7eb;
-    border-radius:16px;
-    padding:18px 24px;
-    margin-bottom:24px;
-    box-shadow:0 4px 18px rgba(15,23,42,.04);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:22px 26px;
+    margin-bottom:25px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    box-shadow:0 8px 30px rgba(15,23,42,.035);
+}
+
+.topbar-left{
+    min-width:0;
+}
+
+.topbar-eyebrow{
+    color:var(--blue);
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+    margin-bottom:6px;
 }
 
 .topbar-title{
-    font-size:22px;
-    font-weight:700;
-    color:#111827;
+    color:var(--text);
+    font-size:26px;
+    line-height:1.2;
+    font-weight:800;
+    letter-spacing:-.7px;
     margin:0;
 }
 
 .topbar-subtitle{
-    color:#6b7280;
+    color:var(--muted);
     font-size:13px;
-    margin-top:4px;
+    margin-top:7px;
+    line-height:1.55;
 }
 
 .status-badge{
     display:inline-flex;
     align-items:center;
-    padding:6px 11px;
+    gap:6px;
+    padding:7px 11px;
     border-radius:999px;
-    font-size:12px;
-    font-weight:600;
+    font-size:11px;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.status-badge::before{
+    content:"";
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:currentColor;
 }
 
 .status-open{
-    background:#ecfdf3;
-    color:#15803d;
+    background:var(--green-soft);
+    color:var(--green);
 }
 
 .status-active{
-    background:#eff6ff;
-    color:#2563eb;
+    background:var(--blue-soft);
+    color:var(--blue);
 }
 
 .status-warning{
-    background:#fff7ed;
+    background:var(--orange-soft);
     color:#c2410c;
 }
 
 .status-danger{
-    background:#fef2f2;
-    color:#dc2626;
+    background:var(--red-soft);
+    color:var(--red);
+}
+
+.hero{
+    background:var(--navy);
+    border-radius:22px;
+    padding:34px 38px;
+    margin-bottom:25px;
+    position:relative;
+    overflow:hidden;
+}
+
+.hero::after{
+    content:"";
+    position:absolute;
+    width:240px;
+    height:240px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.08);
+    right:-55px;
+    top:-90px;
+}
+
+.hero::before{
+    content:"";
+    position:absolute;
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    border:1px solid rgba(249,115,22,.25);
+    right:65px;
+    bottom:-100px;
+}
+
+.hero-kicker{
+    color:#93c5fd;
+    font-size:11px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:1.3px;
+    margin-bottom:10px;
+}
+
+.hero-title{
+    color:#ffffff;
+    font-size:31px;
+    line-height:1.16;
+    font-weight:800;
+    letter-spacing:-.9px;
+    max-width:760px;
+}
+
+.hero-description{
+    color:#cbd5e1;
+    font-size:13px;
+    line-height:1.7;
+    max-width:720px;
+    margin-top:12px;
+}
+
+.hero-accent{
+    color:#fb923c;
+}
+
+.hero-stat-row{
+    display:flex;
+    gap:12px;
+    margin-top:24px;
+    flex-wrap:wrap;
+}
+
+.hero-stat{
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:11px;
+    padding:10px 14px;
+    color:#e2e8f0;
+    font-size:11px;
+}
+
+.hero-stat strong{
+    color:#ffffff;
+    font-size:13px;
 }
 
 .kpi-card{
     background:#ffffff;
-    border:1px solid #e5e7eb;
-    border-radius:16px;
+    border:1px solid var(--border);
+    border-radius:15px;
     padding:20px;
-    min-height:125px;
-    box-shadow:0 4px 18px rgba(15,23,42,.04);
+    min-height:132px;
+    box-shadow:0 6px 24px rgba(15,23,42,.035);
+    transition:transform .18s ease,box-shadow .18s ease;
+}
+
+.kpi-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 30px rgba(15,23,42,.06);
 }
 
 .kpi-label{
-    color:#6b7280;
-    font-size:13px;
-    font-weight:500;
+    color:#64748b;
+    font-size:11px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.45px;
 }
 
 .kpi-value{
-    color:#111827;
-    font-size:28px;
-    font-weight:700;
-    margin-top:8px;
+    color:var(--text);
+    font-size:27px;
+    line-height:1.2;
+    font-weight:800;
+    margin-top:9px;
+    letter-spacing:-.5px;
 }
 
 .kpi-note{
-    color:#9ca3af;
-    font-size:12px;
-    margin-top:5px;
+    color:#94a3b8;
+    font-size:11px;
+    line-height:1.45;
+    margin-top:7px;
 }
 
 .section-title{
-    color:#111827;
-    font-size:19px;
-    font-weight:700;
+    color:var(--text);
+    font-size:18px;
+    line-height:1.3;
+    font-weight:800;
+    letter-spacing:-.25px;
     margin-top:28px;
-    margin-bottom:5px;
+    margin-bottom:4px;
 }
 
 .section-description{
-    color:#6b7280;
-    font-size:13px;
-    margin-bottom:16px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.55;
+    margin-bottom:14px;
 }
 
 .panel{
     background:#ffffff;
-    border:1px solid #e5e7eb;
-    border-radius:16px;
+    border:1px solid var(--border);
+    border-radius:15px;
     padding:20px;
-    box-shadow:0 4px 18px rgba(15,23,42,.04);
+    box-shadow:0 6px 24px rgba(15,23,42,.035);
 }
 
 .info-box{
-    background:#f8fafc;
+    background:#f1f5f9;
     border:1px solid #e2e8f0;
-    border-radius:12px;
-    padding:15px 17px;
+    border-left:3px solid var(--blue);
+    border-radius:11px;
+    padding:14px 16px;
     color:#475569;
-    font-size:13px;
-    line-height:1.6;
+    font-size:12px;
+    line-height:1.65;
     margin-bottom:18px;
 }
 
-.login-page{
-    min-height:80vh;
+.action-card{
+    background:#ffffff;
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:19px;
+    min-height:150px;
+    box-shadow:0 6px 24px rgba(15,23,42,.03);
+}
+
+.action-title{
+    color:var(--text);
+    font-size:14px;
+    font-weight:800;
+}
+
+.action-description{
+    color:#64748b;
+    font-size:12px;
+    line-height:1.6;
+    margin-top:8px;
+}
+
+.action-icon{
+    width:32px;
+    height:32px;
     display:flex;
     align-items:center;
     justify-content:center;
+    border-radius:9px;
+    background:#eff6ff;
+    color:var(--blue);
+    margin-bottom:12px;
+    font-size:15px;
+}
+
+.alert-card{
+    background:#ffffff;
+    border:1px solid var(--border);
+    border-left:3px solid var(--orange);
+    border-radius:12px;
+    padding:15px 17px;
+    margin-bottom:10px;
+    box-shadow:0 4px 18px rgba(15,23,42,.025);
+}
+
+.alert-title{
+    color:var(--text);
+    font-weight:700;
+    font-size:13px;
+    margin-top:9px;
+}
+
+.alert-text{
+    color:#64748b;
+    font-size:12px;
+    line-height:1.55;
+    margin-top:4px;
+}
+
+.login-page{
+    min-height:88vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        radial-gradient(circle at 20% 20%,rgba(37,99,235,.06),transparent 30%),
+        radial-gradient(circle at 80% 80%,rgba(249,115,22,.06),transparent 28%);
+}
+
+.login-shell{
+    max-width:1040px;
+    margin:0 auto;
+    width:100%;
+}
+
+.login-visual{
+    background:var(--navy);
+    border-radius:20px;
+    min-height:470px;
+    padding:40px;
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.login-visual::after{
+    content:"";
+    position:absolute;
+    width:300px;
+    height:300px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:50%;
+    right:-120px;
+    top:-100px;
+}
+
+.login-visual::before{
+    content:"";
+    position:absolute;
+    width:180px;
+    height:180px;
+    border:1px solid rgba(249,115,22,.25);
+    border-radius:50%;
+    left:-80px;
+    bottom:-70px;
+}
+
+.login-logo{
+    color:#ffffff;
+    font-size:25px;
+    font-weight:800;
+    letter-spacing:-.6px;
+}
+
+.login-kicker{
+    color:#93c5fd;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+    margin-top:45px;
+}
+
+.login-heading{
+    color:#ffffff;
+    font-size:31px;
+    line-height:1.17;
+    font-weight:800;
+    letter-spacing:-.9px;
+    margin-top:10px;
+}
+
+.login-heading span{
+    color:#fb923c;
+}
+
+.login-copy{
+    color:#cbd5e1;
+    font-size:12px;
+    line-height:1.7;
+    max-width:430px;
+    margin-top:14px;
+}
+
+.login-feature{
+    color:#e2e8f0;
+    font-size:11px;
+    margin-top:22px;
+}
+
+.login-feature div{
+    margin-top:8px;
+}
+
+.login-feature span{
+    color:#fb923c;
+    margin-right:7px;
 }
 
 [data-testid="stForm"]{
     background:#ffffff;
-    border:1px solid #e5e7eb;
-    border-radius:18px;
-    padding:36px 38px 30px 38px !important;
-    box-shadow:0 18px 50px rgba(15,23,42,.08);
+    border:1px solid var(--border);
+    border-radius:20px;
+    padding:34px 34px 30px 34px!important;
+    box-shadow:0 18px 55px rgba(15,23,42,.08);
 }
 
-.login-brand{
-    font-size:30px;
+.login-form-title{
+    color:var(--text);
+    font-size:22px;
     font-weight:800;
-    color:#111827;
-    text-align:center;
-    margin-bottom:5px;
+    letter-spacing:-.5px;
 }
 
-.login-title{
-    font-size:16px;
+.login-form-subtitle{
     color:#64748b;
-    text-align:center;
-    margin-bottom:22px;
-}
-
-.login-description{
-    color:#64748b;
-    font-size:13px;
+    font-size:12px;
     line-height:1.6;
-    text-align:center;
+    margin-top:6px;
     margin-bottom:22px;
 }
 
 .login-footer{
     text-align:center;
     color:#94a3b8;
-    font-size:12px;
-    margin-top:18px;
+    font-size:10px;
+    margin-top:17px;
 }
 
 .metric-positive{
-    color:#15803d;
+    color:var(--green);
     font-weight:700;
 }
 
 .metric-negative{
-    color:#dc2626;
+    color:var(--red);
     font-weight:700;
 }
 
-.alert-card{
-    background:#ffffff;
-    border:1px solid #e5e7eb;
-    border-left:4px solid #f97316;
-    border-radius:12px;
-    padding:16px;
-    margin-bottom:12px;
-}
-
-.alert-title{
-    color:#111827;
+.table-heading{
+    color:#334155;
+    font-size:11px;
     font-weight:700;
-    font-size:14px;
-}
-
-.alert-text{
-    color:#64748b;
-    font-size:13px;
-    margin-top:4px;
-}
-
-.action-card{
-    background:#ffffff;
-    border:1px solid #e5e7eb;
-    border-radius:16px;
-    padding:20px;
-    min-height:145px;
-}
-
-.action-title{
-    color:#111827;
-    font-size:15px;
-    font-weight:700;
-}
-
-.action-description{
-    color:#64748b;
-    font-size:13px;
-    line-height:1.55;
-    margin-top:8px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
 }
 
 .footer{
     text-align:center;
     color:#94a3b8;
-    font-size:12px;
-    padding-top:30px;
+    font-size:10px;
+    padding-top:35px;
 }
 
 div[data-testid="stDataFrame"]{
-    border:1px solid #e5e7eb;
+    border:1px solid var(--border);
     border-radius:12px;
     overflow:hidden;
+    background:#ffffff;
 }
 
 .stButton button{
     border-radius:9px;
-    font-weight:600;
+    font-weight:700;
+    transition:all .18s ease;
+}
+
+.stButton button[kind="primary"]{
+    background:var(--navy);
+    border-color:var(--navy);
+}
+
+.stButton button[kind="primary"]:hover{
+    background:#16385f;
+    border-color:#16385f;
 }
 
 .stSelectbox label,
 .stMultiSelect label,
 .stRadio label{
     font-weight:600;
-    color:#374151;
+    color:#334155;
+    font-size:12px;
 }
 
+.stTextInput label{
+    font-size:12px;
+    font-weight:600;
+    color:#334155;
+}
+
+div[data-baseweb="select"]{
+    border-radius:9px;
+}
+
+div[data-testid="stMetric"]{
+    background:#ffffff;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px 14px;
+}
+
+.stAlert{
+    border-radius:11px;
+}
+
+[data-testid="stExpander"]{
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:#ffffff;
+}
+
+.plot-container{
+    border:1px solid var(--border);
+    border-radius:15px;
+    padding:6px;
+    background:#ffffff;
+}
+
+@media(max-width:900px){
+    .block-container{
+        padding-left:18px;
+        padding-right:18px;
+    }
+
+    .topbar{
+        padding:18px;
+    }
+
+    .topbar-title{
+        font-size:21px;
+    }
+
+    .hero{
+        padding:25px;
+    }
+
+    .hero-title{
+        font-size:25px;
+    }
+}
 </style>
 """,unsafe_allow_html=True)
 
 
 def generate_sample_data():
     np.random.seed(42)
-
     end_date=pd.Timestamp("2026-09-06")
     dates=pd.date_range(end=end_date,periods=240,freq="D")
-
     stores=[f"Store {i:02d}" for i in range(1,6)]
     products=[f"P{i:03d}" for i in range(1,25)]
-
     categories=[
         "Grocery",
         "Beverages",
@@ -356,7 +766,6 @@ def generate_sample_data():
         "Snacks",
         "Dairy"
     ]
-
     regions=[
         "West",
         "North",
@@ -364,9 +773,7 @@ def generate_sample_data():
         "East",
         "Central"
     ]
-
     rows=[]
-
     store_factors={
         "Store 01":1.00,
         "Store 02":1.12,
@@ -374,7 +781,6 @@ def generate_sample_data():
         "Store 04":1.20,
         "Store 05":0.84
     }
-
     category_factors={
         "Grocery":1.10,
         "Beverages":1.25,
@@ -383,41 +789,32 @@ def generate_sample_data():
         "Snacks":1.15,
         "Dairy":1.05
     }
-
     for store in stores:
         region=regions[stores.index(store)]
-
         for product_index,product in enumerate(products):
             category=categories[product_index%len(categories)]
             base_price=40+(product_index%12)*8
-
             for date in dates:
                 day_of_week=date.dayofweek
                 month=date.month
-
                 weekend_factor=1.12 if day_of_week>=5 else 1.0
                 seasonal_factor=1.0+0.12*np.sin((month/12)*2*np.pi)
                 trend_factor=1.0+(date-dates.min()).days/240*0.10
-
                 discount=np.random.choice(
                     [0,5,10,15,20],
                     p=[0.45,0.20,0.18,0.12,0.05]
                 )
-
                 weather=np.random.choice(
                     ["Clear","Cloudy","Rain","Hot"],
                     p=[0.45,0.20,0.20,0.15]
                 )
-
                 weather_factor={
                     "Clear":1.02,
                     "Cloudy":0.98,
                     "Rain":0.92,
                     "Hot":1.06
                 }[weather]
-
                 price=base_price*(1-discount/100)
-
                 demand=(
                     22
                     *store_factors[store]
@@ -427,11 +824,9 @@ def generate_sample_data():
                     *trend_factor
                     *weather_factor
                 )
-
                 demand*=max(0.65,1+(discount/100)*0.7)
                 demand+=np.random.normal(0,3.0)
                 units=max(0,int(round(demand)))
-
                 inventory=max(
                     0,
                     int(
@@ -439,9 +834,7 @@ def generate_sample_data():
                         +np.random.normal(0,15)
                     )
                 )
-
                 revenue=units*price
-
                 rows.append({
                     "Date":date,
                     "Store":store,
@@ -455,7 +848,6 @@ def generate_sample_data():
                     "Inventory":inventory,
                     "Revenue":round(revenue,2)
                 })
-
     return pd.DataFrame(rows)
 
 
@@ -477,35 +869,29 @@ class DemandForecaster:
 
     def create_features(self,data):
         data=data.copy()
-
         data["Date"]=pd.to_datetime(data["Date"])
         data=data.sort_values(
             ["Store","Product","Date"]
         ).reset_index(drop=True)
-
         grouped=data.groupby(
             ["Store","Product"],
             group_keys=False
         )
-
         data["Lag_1"]=grouped["Units_Sold"].shift(1)
         data["Lag_7"]=grouped["Units_Sold"].shift(7)
         data["Lag_14"]=grouped["Units_Sold"].shift(14)
-
         data["Rolling_7"]=grouped["Units_Sold"].transform(
             lambda x:x.shift(1).rolling(
                 7,
                 min_periods=3
             ).mean()
         )
-
         data["Rolling_14"]=grouped["Units_Sold"].transform(
             lambda x:x.shift(1).rolling(
                 14,
                 min_periods=5
             ).mean()
         )
-
         data["EWM_7"]=grouped["Units_Sold"].transform(
             lambda x:x.shift(1).ewm(
                 span=7,
@@ -513,44 +899,34 @@ class DemandForecaster:
                 min_periods=3
             ).mean()
         )
-
         data["Recent_Demand"]=data["Rolling_7"]
-
         data["Inv_Demand_Ratio"]=(
             data["Inventory"]/
             (data["Recent_Demand"]+1)
         )
-
         data["DayOfWeek"]=data["Date"].dt.dayofweek
         data["DayOfMonth"]=data["Date"].dt.day
         data["Month"]=data["Date"].dt.month
         data["WeekOfYear"]=data["Date"].dt.isocalendar().week.astype(int)
         data["Quarter"]=data["Date"].dt.quarter
         data["IsWeekend"]=(data["DayOfWeek"]>=5).astype(int)
-
         data["MonthSin"]=np.sin(
             2*np.pi*data["Month"]/12
         )
-
         data["MonthCos"]=np.cos(
             2*np.pi*data["Month"]/12
         )
-
         data["DaySin"]=np.sin(
             2*np.pi*data["DayOfWeek"]/7
         )
-
         data["DayCos"]=np.cos(
             2*np.pi*data["DayOfWeek"]/7
         )
-
         data["Effective_Price"]=data["Price"]
-
         return data
 
     def prepare_features(self,data,fit=False):
         feature_data=self.create_features(data)
-
         feature_data=pd.get_dummies(
             feature_data,
             columns=[
@@ -563,33 +939,27 @@ class DemandForecaster:
             drop_first=False,
             dtype=float
         )
-
         excluded=[
             "Date",
             "Units_Sold",
             "Revenue"
         ]
-
         if fit:
             self.features=[
                 column
                 for column in feature_data.columns
                 if column not in excluded
             ]
-
         for column in self.features:
             if column not in feature_data.columns:
                 feature_data[column]=0.0
-
         return feature_data
 
     def train(self,data):
-
         feature_data=self.prepare_features(
             data,
             fit=True
         )
-
         feature_data=feature_data.dropna(
             subset=[
                 "Lag_1",
@@ -597,102 +967,68 @@ class DemandForecaster:
                 "Rolling_7"
             ]
         ).copy()
-
         feature_data=feature_data.sort_values(
             "Date"
         ).reset_index(drop=True)
-
         if len(feature_data)<30:
             raise ValueError(
                 "Not enough historical observations to train the demand model."
             )
-
         split_index=int(
             len(feature_data)*0.80
         )
-
-        train_data=feature_data.iloc[
-            :split_index
-        ].copy()
-
-        valid_data=feature_data.iloc[
-            split_index:
-        ].copy()
-
+        train_data=feature_data.iloc[:split_index].copy()
+        valid_data=feature_data.iloc[split_index:].copy()
         X_train=train_data[
             self.features
         ].copy()
-
         y_train=train_data[
             "Units_Sold"
         ].astype(float)
-
         X_valid=valid_data[
             self.features
         ].copy()
-
         y_valid=valid_data[
             "Units_Sold"
         ].astype(float)
-
-        self.scaler.fit(
-            X_train
-        )
-
-        X_train_scaled=self.scaler.transform(
-            X_train
-        )
-
-        X_valid_scaled=self.scaler.transform(
-            X_valid
-        )
-
+        self.scaler.fit(X_train)
+        X_train_scaled=self.scaler.transform(X_train)
+        X_valid_scaled=self.scaler.transform(X_valid)
         self.model.fit(
             X_train_scaled,
             y_train
         )
-
         predictions=self.model.predict(
             X_valid_scaled
         )
-
         predictions=np.maximum(
             predictions,
             0
         )
-
         self.validation_r2=r2_score(
             y_valid,
             predictions
         )
-
         self.validation_mae=mean_absolute_error(
             y_valid,
             predictions
         )
-
         self.trained=True
-
         return (
             self.validation_r2,
             self.validation_mae
         )
 
     def predict(self,data):
-
         if not self.trained:
             return None
-
         work=data.copy()
-
         work["_original_order"]=np.arange(
             len(work)
         )
-
         feature_data=self.create_features(
             work
         )
-
         feature_data=pd.get_dummies(
             feature_data,
             columns=[
@@ -705,19 +1041,15 @@ class DemandForecaster:
             drop_first=False,
             dtype=float
         )
-
         for column in self.features:
             if column not in feature_data.columns:
                 feature_data[column]=0.0
-
         feature_data=feature_data.sort_values(
             "_original_order"
         ).reset_index(drop=True)
-
         X=feature_data[
             self.features
         ].copy()
-
         valid_mask=(
             X["Lag_1"].notna()
             &
@@ -725,26 +1057,20 @@ class DemandForecaster:
             &
             X["Rolling_7"].notna()
         )
-
         predictions=np.full(
             len(feature_data),
             np.nan
         )
-
         if valid_mask.any():
-
             X_valid=X.loc[
                 valid_mask
             ].copy()
-
             X_valid_scaled=self.scaler.transform(
                 X_valid
             )
-
             predictions[valid_mask]=self.model.predict(
                 X_valid_scaled
             )
-
         return np.maximum(
             predictions,
             0
@@ -754,22 +1080,17 @@ class DemandForecaster:
 class InventoryOptimizer:
 
     def calculate(self,data):
-
         data=data.copy()
-
         data["Date"]=pd.to_datetime(
             data["Date"]
         )
-
         data=data.sort_values(
             ["Store","Product","Date"]
         ).reset_index(drop=True)
-
         grouped=data.groupby(
             ["Store","Product"],
             group_keys=False
         )
-
         data["Recent_Demand"]=grouped[
             "Units_Sold"
         ].transform(
@@ -778,7 +1099,6 @@ class InventoryOptimizer:
                 min_periods=3
             ).mean()
         )
-
         fallback=grouped[
             "Units_Sold"
         ].transform(
@@ -786,24 +1106,20 @@ class InventoryOptimizer:
                 min_periods=1
             ).mean()
         )
-
         data["Recent_Demand"]=data[
             "Recent_Demand"
         ].fillna(
             fallback
         )
-
         data["Recent_Demand"]=data[
             "Recent_Demand"
         ].fillna(0)
-
         data["DaysToStockout"]=np.where(
             data["Recent_Demand"]>0,
             data["Inventory"]/
             data["Recent_Demand"],
             np.inf
         )
-
         demand_std=grouped[
             "Units_Sold"
         ].transform(
@@ -812,18 +1128,14 @@ class InventoryOptimizer:
                 min_periods=5
             ).std()
         )
-
         demand_std=demand_std.fillna(
             data["Recent_Demand"]*0.20
         )
-
         data["SafetyStock"]=np.maximum(
             demand_std.fillna(0)*1.65,
             2
         )
-
         lead_time_days=7
-
         data["RecommendedReorder"]=np.maximum(
             0,
             (
@@ -833,7 +1145,6 @@ class InventoryOptimizer:
                 data["Inventory"]
             )
         ).round().astype(int)
-
         data["Risk"]=np.select(
             [
                 data["DaysToStockout"]<=3,
@@ -847,29 +1158,22 @@ class InventoryOptimizer:
             ],
             default="Low"
         )
-
         return data
 
 
 def generate_alerts(data):
-
     alerts=[]
-
     critical=data[
         data["Risk"]=="Critical"
     ].copy()
-
     high=data[
         data["Risk"]=="High"
     ].copy()
-
     if not critical.empty:
-
         for _,row in critical.nlargest(
             8,
             "RecommendedReorder"
         ).iterrows():
-
             alerts.append({
                 "Severity":"Critical",
                 "Store":row["Store"],
@@ -881,14 +1185,11 @@ def generate_alerts(data):
                     f"{int(row['RecommendedReorder'])} units."
                 )
             })
-
     if not high.empty:
-
         for _,row in high.nlargest(
             8,
             "RecommendedReorder"
         ).iterrows():
-
             alerts.append({
                 "Severity":"High",
                 "Store":row["Store"],
@@ -898,14 +1199,12 @@ def generate_alerts(data):
                     f"{row['DaysToStockout']:.1f} days."
                 )
             })
-
     return pd.DataFrame(
         alerts
     )
 
 
 def metric_card(label,value,note):
-
     st.markdown(
         f"""
         <div class="kpi-card">
@@ -919,11 +1218,11 @@ def metric_card(label,value,note):
 
 
 def page_header(title,description):
-
     st.markdown(
         f"""
         <div class="topbar">
-            <div>
+            <div class="topbar-left">
+                <div class="topbar-eyebrow">Retail intelligence workspace</div>
                 <div class="topbar-title">{title}</div>
                 <div class="topbar-subtitle">{description}</div>
             </div>
@@ -937,7 +1236,6 @@ def page_header(title,description):
 
 
 def section_header(title,description):
-
     st.markdown(
         f"""
         <div class="section-title">{title}</div>
@@ -948,63 +1246,82 @@ def section_header(title,description):
 
 
 def initialize_session():
-
     if "logged_in" not in st.session_state:
         st.session_state.logged_in=False
-
     if "role" not in st.session_state:
         st.session_state.role=None
-
     if "store" not in st.session_state:
         st.session_state.store="All Stores"
-
     if "model" not in st.session_state:
         st.session_state.model=None
-
     if "model_r2" not in st.session_state:
         st.session_state.model_r2=np.nan
-
     if "model_mae" not in st.session_state:
         st.session_state.model_mae=np.nan
 
 
 @st.cache_data
 def load_data():
-
     return generate_sample_data()
 
 
 def login_screen(data):
-
     st.markdown(
         '<div class="login-page">',
         unsafe_allow_html=True
     )
 
-    left,center,right=st.columns(
-        [1,1.05,1]
+    st.markdown(
+        '<div class="login-shell">',
+        unsafe_allow_html=True
     )
 
+    left,center=st.columns(
+        [1.15,0.85],
+        gap="large"
+    )
+
+    with left:
+        st.markdown(
+            """
+            <div class="login-visual">
+                <div>
+                    <div class="login-logo">RetailIQ</div>
+                    <div class="login-kicker">Demand intelligence platform</div>
+                    <div class="login-heading">
+                        Turn retail data into
+                        <span>clear decisions.</span>
+                    </div>
+                    <div class="login-copy">
+                        Monitor demand patterns, understand inventory exposure,
+                        and identify replenishment priorities through one
+                        focused retail operations workspace.
+                    </div>
+                    <div class="login-feature">
+                        <div><span>●</span>Demand pattern analysis</div>
+                        <div><span>●</span>Inventory coverage monitoring</div>
+                        <div><span>●</span>Replenishment prioritisation</div>
+                    </div>
+                </div>
+                <div style="color:#64748b;font-size:10px;">
+                    Retail operations intelligence
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
     with center:
-
         with st.form("login_form"):
-
             st.markdown(
-                '<div class="login-brand">RetailIQ</div>',
-                unsafe_allow_html=True
-            )
-
-            st.markdown(
-                '<div class="login-title">Demand & Inventory Intelligence</div>',
+                '<div class="login-form-title">Welcome back</div>',
                 unsafe_allow_html=True
             )
 
             st.markdown(
                 """
-                <div class="login-description">
-                RetailIQ helps store teams understand demand,
-                monitor inventory risk, and identify replenishment
-                priorities using historical sales data.
+                <div class="login-form-subtitle">
+                    Choose your workspace access and store view to continue.
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -1029,30 +1346,30 @@ def login_screen(data):
                 stores
             )
 
-            st.caption(
-                "Select the access level and store view you want to use."
+            st.markdown(
+                "<div style='height:8px'></div>",
+                unsafe_allow_html=True
             )
 
             submitted=st.form_submit_button(
-                "Sign in",
-                width="stretch"
+                "Enter workspace →",
+                width="stretch",
+                type="primary"
             )
 
             if submitted:
-
                 st.session_state.logged_in=True
                 st.session_state.role=role
                 st.session_state.store=store
-
                 st.rerun()
 
         st.markdown(
-            '<div class="login-footer">Retail operations workspace</div>',
+            '<div class="login-footer">Secure retail analytics workspace</div>',
             unsafe_allow_html=True
         )
 
     st.markdown(
-        '</div>',
+        '</div></div>',
         unsafe_allow_html=True
     )
 
@@ -1062,10 +1379,8 @@ initialize_session()
 data=load_data()
 
 if not st.session_state.logged_in:
-
     login_screen(data)
     st.stop()
-
 
 model=st.session_state.model
 
@@ -1084,22 +1399,21 @@ with st.sidebar:
 
     st.markdown(
         """
-        <div style="
-            font-size:24px;
-            font-weight:800;
-            color:#ffffff;
-            padding:10px 0 4px 0;
-        ">
-        RetailIQ
-        </div>
-        <div style="
-            color:#94a3b8;
-            font-size:12px;
-            margin-bottom:24px;
-        ">
-        Demand & Inventory Intelligence
+        <div class="sidebar-brand">
+            <div class="sidebar-logo">
+                <div class="sidebar-mark">R</div>
+                <div class="sidebar-name">RetailIQ</div>
+            </div>
+            <div class="sidebar-tagline">
+                Demand & inventory intelligence
+            </div>
         </div>
         """,
+        unsafe_allow_html=True
+    )
+
+    st.markdown(
+        '<div class="sidebar-section">Workspace</div>',
         unsafe_allow_html=True
     )
 
@@ -1112,13 +1426,14 @@ with st.sidebar:
             "Alerts",
             "Business Insights"
         ],
-        label_visibility="visible"
+        label_visibility="collapsed"
     )
 
     st.divider()
 
     st.markdown(
-        "**Current View**"
+        '<div class="sidebar-section">Current view</div>',
+        unsafe_allow_html=True
     )
 
     store_options=[
@@ -1140,35 +1455,32 @@ with st.sidebar:
     st.divider()
 
     st.markdown(
-        "**Model**"
+        '<div class="sidebar-section">Model status</div>',
+        unsafe_allow_html=True
     )
 
     if model is not None and model.trained:
-
         st.markdown(
             '<span class="status-badge status-active">Active</span>',
             unsafe_allow_html=True
         )
-
         st.caption(
-            "Demand model is active."
+            "Demand model is ready."
         )
-
     else:
-
         st.markdown(
             '<span class="status-badge status-warning">Not trained</span>',
             unsafe_allow_html=True
         )
-
         st.caption(
-            "Train the demand model to generate demand estimates."
+            "Train the model to enable demand estimates."
         )
 
     st.divider()
 
     st.markdown(
-        "**Account**"
+        '<div class="sidebar-section">Account</div>',
+        unsafe_allow_html=True
     )
 
     st.caption(
@@ -1179,7 +1491,6 @@ with st.sidebar:
         "Sign out",
         width="stretch"
     ):
-
         st.session_state.logged_in=False
         st.session_state.model=None
         st.rerun()
@@ -1189,7 +1500,30 @@ if navigation=="Dashboard":
 
     page_header(
         "Dashboard",
-        "A high-level view of demand, inventory and operational priorities."
+        "A focused view of demand, inventory exposure and operational priorities."
+    )
+
+    st.markdown(
+        """
+        <div class="hero">
+            <div class="hero-kicker">Retail demand intelligence</div>
+            <div class="hero-title">
+                Understand what customers are buying,
+                where demand is moving, and what needs attention.
+            </div>
+            <div class="hero-description">
+                RetailIQ brings historical sales, demand patterns and
+                inventory signals together in one operational workspace.
+            </div>
+            <div class="hero-stat-row">
+                <div class="hero-stat"><strong>5</strong> stores</div>
+                <div class="hero-stat"><strong>24</strong> products</div>
+                <div class="hero-stat"><strong>240</strong> days of history</div>
+                <div class="hero-stat"><strong>Daily</strong> demand view</div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
     if selected_store=="All Stores":
@@ -1199,7 +1533,6 @@ if navigation=="Dashboard":
         view_data=data[
             data["Store"]==selected_store
         ].copy()
-
         view_inventory=inventory_data[
             inventory_data["Store"]==selected_store
         ].copy()
@@ -1221,12 +1554,6 @@ if navigation=="Dashboard":
     critical_count=int(
         (
             view_inventory["Risk"]=="Critical"
-        ).sum()
-    )
-
-    high_count=int(
-        (
-            view_inventory["Risk"]=="High"
         ).sum()
     )
 
@@ -1280,79 +1607,102 @@ if navigation=="Dashboard":
         }
     )
 
+    fig.update_traces(
+        line=dict(
+            width=2.5,
+            color="#2563eb"
+        )
+    )
+
     fig.update_layout(
-        height=360,
+        height=370,
         margin=dict(
             l=10,
             r=10,
-            t=20,
+            t=15,
             b=10
         ),
         plot_bgcolor="white",
-        paper_bgcolor="white"
+        paper_bgcolor="white",
+        font=dict(
+            family="Inter",
+            color="#475569"
+        ),
+        xaxis=dict(
+            showgrid=False
+        ),
+        yaxis=dict(
+            gridcolor="#eef2f7"
+        )
     )
 
     st.plotly_chart(
         fig,
-        width="stretch"
+        width="stretch",
+        config={
+            "displayModeBar":False
+        }
     )
 
     section_header(
         "Operational priorities",
-        "Inventory categories requiring the most attention."
+        "Three signals to keep visible during daily retail operations."
     )
 
     a,b,c=st.columns(3)
 
     with a:
-
         st.markdown(
             """
             <div class="action-card">
+                <div class="action-icon">!</div>
                 <div class="action-title">Critical stock</div>
                 <div class="action-description">
-                Items with very low inventory coverage and a high
-                probability of stockout.
+                    Items with very low inventory coverage and a high
+                    stockout exposure.
                 </div>
             </div>
             """,
             unsafe_allow_html=True
         )
-
         st.metric(
             "Items",
             critical_count
         )
 
     with b:
-
         st.markdown(
             """
             <div class="action-card">
+                <div class="action-icon">↘</div>
                 <div class="action-title">High stockout risk</div>
                 <div class="action-description">
-                Products with approximately one week or less
-                of estimated inventory coverage.
+                    Products with approximately one week or less
+                    of estimated inventory coverage.
                 </div>
             </div>
             """,
             unsafe_allow_html=True
         )
-
+        high_count=int(
+            (
+                view_inventory["Risk"]=="High"
+            ).sum()
+        )
         st.metric(
             "Items",
             high_count
         )
 
     with c:
-
         st.markdown(
             """
             <div class="action-card">
+                <div class="action-icon">↗</div>
                 <div class="action-title">Model status</div>
                 <div class="action-description">
-                Demand estimates are available after the forecasting
-                model has been trained.
+                    Demand estimates become available after the forecasting
+                    model has been trained.
                 </div>
             </div>
             """,
@@ -1360,14 +1710,11 @@ if navigation=="Dashboard":
         )
 
         if model is not None and model.trained:
-
             st.metric(
                 "Validation R²",
                 f"{model.validation_r2:.3f}"
             )
-
         else:
-
             st.metric(
                 "Status",
                 "Not trained"
@@ -1378,17 +1725,16 @@ elif navigation=="Demand Forecast":
 
     page_header(
         "Demand Forecast",
-        "Review model-estimated demand and recent sales patterns."
+        "Review model-estimated demand alongside recent sales behaviour."
     )
 
     st.markdown(
         """
         <div class="info-box">
-        Demand estimates are generated from historical sales,
-        recent demand patterns, pricing, discounts, calendar effects,
-        store characteristics, product information and weather.
-        Model performance is evaluated using a chronological holdout
-        period rather than a random split.
+            Demand estimates use historical sales, recent demand patterns,
+            pricing, discounts, calendar effects, store characteristics,
+            product information and weather. Model performance is evaluated
+            using a chronological holdout period.
         </div>
         """,
         unsafe_allow_html=True
@@ -1399,42 +1745,32 @@ elif navigation=="Demand Forecast":
     )
 
     with train_col:
-
         if st.button(
             "Train demand model",
-            width="stretch"
+            width="stretch",
+            type="primary"
         ):
-
             with st.spinner(
                 "Training demand model..."
             ):
-
                 new_model=DemandForecaster()
-
                 try:
-
                     r2,mae=new_model.train(
                         data
                     )
-
                     st.session_state.model=new_model
                     st.session_state.model_r2=r2
                     st.session_state.model_mae=mae
-
                     st.success(
                         "Demand model trained successfully."
                     )
-
                     st.rerun()
-
                 except Exception as e:
-
                     st.error(
                         f"Model training failed: {e}"
                     )
 
     with info_col:
-
         st.caption(
             "Training uses the first 80% of observations chronologically. "
             "The remaining observations are held out for validation."
@@ -1445,17 +1781,13 @@ elif navigation=="Demand Forecast":
     c1,c2,c3=st.columns(3)
 
     with c1:
-
         if model is not None and model.trained:
-
             metric_card(
                 "Validation R²",
                 f"{model.validation_r2:.3f}",
                 "Chronological holdout performance"
             )
-
         else:
-
             metric_card(
                 "Validation R²",
                 "—",
@@ -1463,17 +1795,13 @@ elif navigation=="Demand Forecast":
             )
 
     with c2:
-
         if model is not None and model.trained:
-
             metric_card(
                 "Validation MAE",
                 f"{model.validation_mae:.2f}",
                 "Average units of prediction error"
             )
-
         else:
-
             metric_card(
                 "Validation MAE",
                 "—",
@@ -1481,7 +1809,6 @@ elif navigation=="Demand Forecast":
             )
 
     with c3:
-
         metric_card(
             "Model status",
             "Active" if model is not None and model.trained else "Not trained",
@@ -1496,11 +1823,8 @@ elif navigation=="Demand Forecast":
         )
 
         if selected_store=="All Stores":
-
             prediction_df=data.copy()
-
         else:
-
             prediction_df=data[
                 data["Store"]==selected_store
             ].copy()
@@ -1540,7 +1864,11 @@ elif navigation=="Demand Forecast":
                 x=daily_prediction["Date"],
                 y=daily_prediction["Actual_Demand"],
                 mode="lines",
-                name="Actual demand"
+                name="Actual demand",
+                line=dict(
+                    color="#0b1f3a",
+                    width=2.4
+                )
             )
         )
 
@@ -1549,7 +1877,12 @@ elif navigation=="Demand Forecast":
                 x=daily_prediction["Date"],
                 y=daily_prediction["Predicted_Demand"],
                 mode="lines",
-                name="Model estimate"
+                name="Model estimate",
+                line=dict(
+                    color="#f97316",
+                    width=2.2,
+                    dash="dot"
+                )
             )
         )
 
@@ -1558,17 +1891,35 @@ elif navigation=="Demand Forecast":
             margin=dict(
                 l=10,
                 r=10,
-                t=20,
+                t=15,
                 b=10
             ),
             plot_bgcolor="white",
             paper_bgcolor="white",
-            hovermode="x unified"
+            hovermode="x unified",
+            font=dict(
+                family="Inter",
+                color="#475569"
+            ),
+            xaxis=dict(
+                showgrid=False
+            ),
+            yaxis=dict(
+                gridcolor="#eef2f7"
+            ),
+            legend=dict(
+                orientation="h",
+                y=1.08,
+                x=0
+            )
         )
 
         st.plotly_chart(
             fig,
-            width="stretch"
+            width="stretch",
+            config={
+                "displayModeBar":False
+            }
         )
 
         section_header(
@@ -1607,11 +1958,9 @@ elif navigation=="Demand Forecast":
         )
 
     else:
-
         st.info(
             "The demand model is not trained yet. "
-            "Select a store if needed and click "
-            "'Train demand model' to activate forecasting."
+            "Click 'Train demand model' to activate forecasting."
         )
 
 
@@ -1623,11 +1972,8 @@ elif navigation=="Inventory":
     )
 
     if selected_store=="All Stores":
-
         view_inventory=inventory_data.copy()
-
     else:
-
         view_inventory=inventory_data[
             inventory_data["Store"]==selected_store
         ].copy()
@@ -1688,7 +2034,7 @@ elif navigation=="Inventory":
 
     section_header(
         "Inventory position",
-        "Use inventory coverage and reorder quantity to prioritize products."
+        "Use inventory coverage and reorder quantity to prioritise products."
     )
 
     risk_filter=st.multiselect(
@@ -1784,6 +2130,12 @@ elif navigation=="Inventory":
             labels={
                 "DaysToStockout":"Estimated Days to Stockout",
                 "Product":"Product"
+            },
+            color_discrete_map={
+                "Critical":"#dc2626",
+                "High":"#f97316",
+                "Medium":"#d97706",
+                "Low":"#2563eb"
             }
         )
 
@@ -1792,16 +2144,34 @@ elif navigation=="Inventory":
             margin=dict(
                 l=10,
                 r=10,
-                t=20,
+                t=15,
                 b=10
             ),
             plot_bgcolor="white",
-            paper_bgcolor="white"
+            paper_bgcolor="white",
+            font=dict(
+                family="Inter",
+                color="#475569"
+            ),
+            xaxis=dict(
+                gridcolor="#eef2f7"
+            ),
+            yaxis=dict(
+                showgrid=False
+            ),
+            legend=dict(
+                orientation="h",
+                y=1.08,
+                x=0
+            )
         )
 
         st.plotly_chart(
             fig,
-            width="stretch"
+            width="stretch",
+            config={
+                "displayModeBar":False
+            }
         )
 
 
@@ -1821,13 +2191,10 @@ elif navigation=="Alerts":
     else:
 
         if selected_store!="All Stores":
-
             filtered_alerts=alerts_data[
                 alerts_data["Store"]==selected_store
             ].copy()
-
         else:
-
             filtered_alerts=alerts_data.copy()
 
         if filtered_alerts.empty:
@@ -1840,7 +2207,7 @@ elif navigation=="Alerts":
 
             section_header(
                 "Priority alerts",
-                "These alerts are based on recent demand and current inventory coverage."
+                "Alerts are based on recent demand and current inventory coverage."
             )
 
             for _,row in filtered_alerts.iterrows():
@@ -1854,16 +2221,14 @@ elif navigation=="Alerts":
                 st.markdown(
                     f"""
                     <div class="alert-card">
-                        <div>
-                            <span class="status-badge {severity_class}">
+                        <span class="status-badge {severity_class}">
                             {row["Severity"]}
-                            </span>
-                        </div>
-                        <div class="alert-title" style="margin-top:9px;">
-                        {row["Store"]} · {row["Product"]}
+                        </span>
+                        <div class="alert-title">
+                            {row["Store"]} · {row["Product"]}
                         </div>
                         <div class="alert-text">
-                        {row["Message"]}
+                            {row["Message"]}
                         </div>
                     </div>
                     """,
@@ -1879,16 +2244,12 @@ elif navigation=="Business Insights":
     )
 
     if selected_store=="All Stores":
-
         view_data=data.copy()
         view_inventory=inventory_data.copy()
-
     else:
-
         view_data=data[
             data["Store"]==selected_store
         ].copy()
-
         view_inventory=inventory_data[
             inventory_data["Store"]==selected_store
         ].copy()
@@ -1918,21 +2279,38 @@ elif navigation=="Business Insights":
         }
     )
 
+    fig.update_traces(
+        marker_color="#0b1f3a"
+    )
+
     fig.update_layout(
         height=380,
         margin=dict(
             l=10,
             r=10,
-            t=20,
+            t=15,
             b=10
         ),
         plot_bgcolor="white",
-        paper_bgcolor="white"
+        paper_bgcolor="white",
+        font=dict(
+            family="Inter",
+            color="#475569"
+        ),
+        xaxis=dict(
+            showgrid=False
+        ),
+        yaxis=dict(
+            gridcolor="#eef2f7"
+        )
     )
 
     st.plotly_chart(
         fig,
-        width="stretch"
+        width="stretch",
+        config={
+            "displayModeBar":False
+        }
     )
 
     section_header(
@@ -2008,25 +2386,24 @@ elif navigation=="Business Insights":
 
         section_header(
             "Model interpretation",
-            "Summary of the current demand model performance."
+            "Summary of current demand model validation performance."
         )
 
         m1,m2=st.columns(2)
 
         with m1:
-
             st.markdown(
                 f"""
                 <div class="panel">
                     <div class="kpi-label">
-                    Chronological validation R²
+                        Chronological validation R²
                     </div>
                     <div class="kpi-value">
-                    {model.validation_r2:.3f}
+                        {model.validation_r2:.3f}
                     </div>
                     <div class="kpi-note">
-                    Measures how much variation in the held-out
-                    demand observations is explained by the model.
+                        Measures variation explained on the held-out
+                        demand observations.
                     </div>
                 </div>
                 """,
@@ -2034,19 +2411,18 @@ elif navigation=="Business Insights":
             )
 
         with m2:
-
             st.markdown(
                 f"""
                 <div class="panel">
                     <div class="kpi-label">
-                    Validation MAE
+                        Validation MAE
                     </div>
                     <div class="kpi-value">
-                    {model.validation_mae:.2f}
+                        {model.validation_mae:.2f}
                     </div>
                     <div class="kpi-note">
-                    Average absolute difference between actual
-                    and model-estimated demand.
+                        Average absolute difference between actual
+                        and model-estimated demand.
                     </div>
                 </div>
                 """,
@@ -2064,7 +2440,7 @@ elif navigation=="Business Insights":
 st.markdown(
     """
     <div class="footer">
-    RetailIQ · Demand forecasting and inventory intelligence
+        RetailIQ · Demand forecasting and inventory intelligence
     </div>
     """,
     unsafe_allow_html=True
